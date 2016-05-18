@@ -1,5 +1,0 @@
-u:Hello there.
-u:What's your name?
-u:Hello there.
-u:Hello there.
-u:What's your car?

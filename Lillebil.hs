@@ -1,5 +1,7 @@
-memory :: FilePath
-memory = "memory.txt"
+import Data.Char
+
+memory :: String -> FilePath
+memory str = "sentences.txt"
 
 prog :: IO() 
 prog = do 
@@ -26,9 +28,16 @@ remember = do
           str <- listen
           if str /= "quit"
           then do 
-           appendFile memory ("u:" ++ str ++ "\n")
+           appendFile memory (userInput str) 
+           appendFile memory (createWords str)
            return True
           else return False
+          
+userInput :: String -> String
+userInput str = "u:" ++ str ++ "\n"
+
+createWords :: String -> String
+createWords str = undefined
           
 printWords :: IO() 
 printWords = do
