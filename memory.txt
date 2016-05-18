@@ -1,2 +1,5 @@
-u:Hi there.
-u:What are you doing?
+u:Hello there.
+u:What's your name?
+u:Hello there.
+u:Hello there.
+u:What's your car?

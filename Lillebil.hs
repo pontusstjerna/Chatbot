@@ -4,20 +4,36 @@ memory = "memory.txt"
 prog :: IO() 
 prog = do 
     putStrLn "Hello! My name is Lillebil. Talk to me!"
-    remember
-    putStrLn "Noticed."
+    chat
 
-listen :: IO()
+    
+chat :: IO()
+chat = do
+    putStr ":> "
+    run <- remember
+    if run then do
+      putStrLn "Noticed. Answers not yet implemented."
+      chat
+    else return ()
+
+listen :: IO String
 listen = do
     userInp <- getLine
-    appendFile memory userInp
+    return userInp
     
-remember :: IO()
+remember :: IO Bool
 remember = do
-          appendFile memory "u:"
-          listen
-          appendFile memory "\n"
-    
+          str <- listen
+          if str /= "quit"
+          then do 
+           appendFile memory ("u:" ++ str ++ "\n")
+           return True
+          else return False
+          
+printWords :: IO() 
+printWords = do
+    str <- readFile memory
+    putStrLn str
     
 main = prog
   -- Compile this file using
