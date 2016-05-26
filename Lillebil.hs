@@ -1,46 +1,32 @@
 import Data.Char
+import ChatEngine
 
 memory :: String -> FilePath
 memory str = "sentences.txt"
 
 prog :: IO() 
 prog = do 
+    putStrLn "Loading... "
+    inp <- readFile memory
     putStrLn "Hello! My name is Lillebil. Talk to me!"
-    chat
+    chat inp
 
     
-chat :: IO()
+chat :: String -> IO String
 chat = do
     putStr ":> "
-    run <- remember
-    if run then do
-      putStrLn "Noticed. Answers not yet implemented."
-      chat
-    else return ()
-
-listen :: IO String
-listen = do
     userInp <- getLine
-    return userInp
-    
-remember :: IO Bool
-remember = do
-          str <- listen
-          if str /= "quit"
-          then do 
-           appendFile memory (userInput str) 
-           appendFile memory (createWords str)
-           return True
-          else return False
-          
+    if(userInp) == "quit" then return ()
+    else return answer $insert userInp 
+      
 userInput :: String -> String
 userInput str = "u:" ++ str ++ "\n"
 
 createWords :: String -> String
 createWords str = undefined
           
-printWords :: IO() 
-printWords = do
+printMemory :: IO() 
+printMemory = do
     str <- readFile memory
     putStrLn str
     
