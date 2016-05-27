@@ -1,26 +1,38 @@
 import Data.Char
 import ChatEngine
+import AATree
 
-memory :: String -> FilePath
-memory str = "sentences.txt"
+memory :: FilePath
+memory = "sentences.txt"
 
 prog :: IO() 
 prog = do 
-    putStrLn "Loading... "
     inp <- readFile memory
     putStrLn "Hello! My name is Lillebil. Talk to me!"
-    chat inp
-
+    putStrLn "Loading..."
+    chat $read inp
     
-chat :: String -> IO String
-chat = do
+chat :: AATree (WordSet String) -> IO ()
+chat tree = do
+    putStrLn $show $size tree
+    if tree /= emptyTree then putStrLn (constructNaive (Just (rootVal tree)) tree)
+    else putStrLn "Created a file."
     putStr ":> "
     userInp <- getLine
-    if(userInp) == "quit" then return ()
-    else return answer $insert userInp 
+    if userInp == "quit" then quit tree
+    else chat (addSent userInp tree)
+    
+quit :: AATree (WordSet String) -> IO ()
+quit tree = do
+    putStrLn "Saving..."
+    putStrLn "Done. Okay. Bye!"
+    writeFile memory $show tree
       
 userInput :: String -> String
 userInput str = "u:" ++ str ++ "\n"
+
+
+  
 
 createWords :: String -> String
 createWords str = undefined

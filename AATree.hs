@@ -54,11 +54,11 @@ level Empty = 0
 level (Node _ lvl _ _) = lvl 
 
 -- Complexity O(log n)
-get :: Ord a => a -> AATree a -> Maybe a
-get _ Empty = Nothing
-get a (Node b _ left right) 
-    | a > b = get a right
-    | a < b = get a left
+get :: Ord a => a -> AATree a -> (a -> String) -> Maybe a
+get _ Empty _ = Nothing
+get a (Node b _ left right) func
+    | func a > func b = get a right func
+    | func a < func b = get a left func
     | otherwise = Just b
     
 -- My own special getter
@@ -78,11 +78,11 @@ update (Node a lvl t1 t2) ele arg func
 -- Insert places the node in its right place
 -- and uses "fix" to fix the invariant
 -- Complexity O(log n)
-insert :: Ord a => a -> AATree a -> AATree a
-insert a Empty = Node a 1 Empty Empty
-insert a (Node b lvl t1 t2)
-       | a <= b = fix (Node b lvl (insert a t1) t2)
-       | a > b = fix $ Node b lvl t1 (insert a t2)
+insert :: Ord a => a -> AATree a -> (a -> String) -> AATree a
+insert a Empty _ = Node a 1 Empty Empty
+insert a (Node b lvl t1 t2) func
+       | func a <= func b = fix (Node b lvl (insert a t1 func) t2)
+       | func a > func b = fix $ Node b lvl t1 (insert a t2 func)
 
 -- If it's a leaf or empty, just leave it because the invariant is already true
 -- First we check if there are three nodes at the root with the same level, if so, increase level of root
@@ -101,7 +101,7 @@ insert a (Node b lvl t1 t2)
   | level t == level (rightSub tr2) = split t
   | otherwise = t      
 
-insert _ _ = error "should never happen, but makes compiler happy.."
+insert _ _ _ = error "should never happen, but makes compiler happy.."
 
 -- Complexity O(n)
 inorder :: AATree a -> [a]

@@ -4,20 +4,21 @@ where
 import AATree
 import Data.Char
 import Data.Maybe
+import MergeSort
 
 word1 = Words "Hello" [(5,"there"), (4,"you"),(3,"!")]
 word2 = Words "Hi" [(1, "there")]
 word3 = Word "Hi"
 
-words1 = addSent "Hello there you beautiful flower!" emptyTree
+words1 = addSent "Hello there you beautiful flower" emptyTree
 
 data WordSet a = Word a | Words a [(Integer, String)]
-    deriving (Eq, Show, Ord)
+    deriving (Eq, Show, Ord, Read)
     
-succ :: WordSet String -> String
-succ (Word _) = ""
-succ (Words _ [(_, str)]) = str
-succ (Words _ ((_,str):as)) = str
+successor :: WordSet String -> String
+successor (Word _) = ""
+successor (Words _ [(_, str)]) = str
+successor (Words _ ((_,str):as)) = str
 
 word :: WordSet String -> String
 word (Word s) = s
@@ -29,13 +30,22 @@ addSent (s:strs) tree = addWords (words ((toLower s):strs)) tree
 
 addWords :: [String] -> AATree (WordSet String) -> AATree (WordSet String)
 addWords [] tree = tree
-addWords [str] tree | getWord' str tree == Nothing = insert (Word str) tree
+addWords [str] tree | getWord' str tree == Nothing = insert (Word str) tree word
                     | otherwise = tree
 addWords (str:succ:strs) tree 
- | getWord' str tree == Nothing = insert (addSucc succ (Word str)) (addWords (succ:strs) tree)
+ | getWord' str tree == Nothing = insert (addSucc succ (Word str)) (addWords (succ:strs) tree) word
  | otherwise = addWords (succ:strs) $update tree (fromJust (getWord' str tree)) succ addSucc
+ 
+addSents :: [String] -> AATree (WordSet String)
+addSents sents = addSents' sents emptyTree
+ where
+ addSents' :: [String] -> AATree (WordSet String) -> AATree (WordSet String)
+ addSents' [] tree = emptyTree
+ addSents' [sent] tree = addSent sent tree
+ addSents' (sent:sents) tree = addSents' sents $ addSent sent tree
 
 getWord' :: String -> AATree (WordSet String) -> Maybe (WordSet String)
+getWord' "" _ = Nothing
 getWord' s tree = getWord ((toLower (head s)):(tail s)) word tree
 
 addSucc :: String -> WordSet String -> WordSet String
@@ -51,25 +61,11 @@ insertSucc s ((w,succ):succs)
  | s == succ = (w+1, succ):succs
  | otherwise = sortSuccs $ (w,succ):(insertSucc s succs)  
  
- 
- 
- 
- 
- 
+constructNaive :: Maybe (WordSet String) -> AATree (WordSet String) -> String
+constructNaive Nothing _ = ""
+constructNaive (Just str) tree = (word str) ++ " " ++ constructNaive (getWord' (successor str) tree) tree
 
-                              
-sortSuccs :: [(Integer, String)] -> [(Integer, String)]
-sortSuccs [] = []
-sortSuccs [x] = [x]
-sortSuccs xs = merge (sortSuccs ys) (sortSuccs zs)
- where
-  n = div (length xs) 2
-  ys = take n xs
-  zs = drop n xs
-
-merge :: [(Integer, String)] -> [(Integer, String)] -> [(Integer, String)]
-merge xs [] = xs
-merge [] ys = ys
-merge (x:xs) (y:ys)
-  | fst x > fst y = x:merge xs (y:ys)
-  | otherwise = y:merge (x:xs) ys
+capital :: String -> String
+capital (s:ss) = (toUpper s):ss
+ 
+ 
