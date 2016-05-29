@@ -28,6 +28,13 @@ addSent :: String -> AATree (WordSet String) -> AATree (WordSet String)
 addSent "" tree = tree
 addSent (s:strs) tree = addWords (words ((toLower s):strs)) tree
 
+ --(addAnswer userInp answer $read score)
+ 
+addAnswer :: String -> String -> Integer -> AATree (WordSet String) -> AATree (WordSet String)
+addAnswer uInp ans score tree 
+ | getWord' uInp tree == Nothing = insert (Words uInp [(score, ans)]) tree word
+ | otherwise = updateX tree (fromJustWordSet (getWord' uInp tree)) ans addSuccs 5
+
 addWords :: [String] -> AATree (WordSet String) -> AATree (WordSet String)
 addWords [] tree = tree
 addWords [str] tree | getWord' str tree == Nothing = insert (Word str) tree word
@@ -46,7 +53,18 @@ addSents sents = addSents' sents emptyTree
 
 getWord' :: String -> AATree (WordSet String) -> Maybe (WordSet String)
 getWord' "" _ = Nothing
-getWord' s tree = getWord ((toLower (head s)):(tail s)) word tree
+getWord' s tree = getWord s word tree
+
+fromJustWordSet :: Maybe (WordSet String) -> WordSet String
+fromJustWordSet (Just w) = w
+fromJustWordSet _        = error "Not found!"
+
+addSuccs :: String -> Int -> WordSet String -> WordSet String -- ugly hack
+addSuccs _ 0 conv = conv
+addSuccs str 1 conv = addSucc str conv
+addSuccs str x conv | x > 5 = addSuccs str 5 conv
+                    | x < 0 = conv
+                    | otherwise = addSuccs str (x-1) (addSucc str conv)
 
 addSucc :: String -> WordSet String -> WordSet String
 addSucc str (Word s) = Words s [(1, str)]

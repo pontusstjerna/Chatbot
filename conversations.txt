@@ -1,1 +1,1 @@
-Node (Words "Hello there Lillebil!" [(1,"Hi there Pontus.")]) 1 Empty Empty
+Node (Words "Hi there, my friend!" [(1,"hello you really are almost dead and ")]) 2 (Node (Words "Hello there Lillebil!" [(1,"Hi there Pontus.")]) 1 Empty Empty) (Node (Words "What are you doing?" [(0,"hello you really are almost dead and ")]) 1 Empty Empty)

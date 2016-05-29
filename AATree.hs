@@ -13,6 +13,7 @@ module AATree (
   get,           -- Ord a => a -> AATree a -> Maybe a
   getWord,       -- My own version
   update,        -- Updates an element with a given function
+  updateX,       -- Updates an element X times with a given function
   insert,        -- Ord a => a -> AATree a -> AATree a
   inorder,       -- AATree a -> [a]
   remove,        -- Ord a => a -> AATree a -> AATree a
@@ -74,6 +75,12 @@ update Empty _ _ _ = Empty
 update (Node a lvl t1 t2) ele arg func
  | ele == a = (Node (func arg a) lvl t1 t2)
  | otherwise = (Node a lvl (update t1 ele arg func)(update t2 ele arg func))
+ 
+updateX :: Ord a => AATree a -> a -> b -> (b -> c -> a -> a) -> c -> AATree a
+updateX Empty _ _ _ _ = Empty
+updateX (Node a lvl t1 t2) ele arg func x
+ | ele == a = (Node (func arg x a) lvl t1 t2)
+ | otherwise = (Node a lvl (updateX t1 ele arg func x)(updateX t2 ele arg func x))
 
 -- Insert places the node in its right place
 -- and uses "fix" to fix the invariant
