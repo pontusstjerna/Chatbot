@@ -1,32 +1,39 @@
 import Data.Char
-import ChatEngine
+import WordSet
 import AATree
+import Sentence
 
-memory :: FilePath
-memory = "sentences.txt"
+wordsets :: FilePath
+wordsets = "wordsets.txt"
+
+conversations :: FilePath
+conversations = "conversations.txt"
 
 prog :: IO() 
 prog = do 
-    inp <- readFile memory
+    wordsets <- readFile wordsets
+    conversations <- readFile conversations
     putStrLn "Hello! My name is Lillebil. Talk to me!"
     putStrLn "Loading..."
-    chat $read inp
+    chat (read wordsets) (read conversations)
     
-chat :: AATree (WordSet String) -> IO ()
-chat tree = do
-    putStrLn $show $size tree
-    if tree /= emptyTree then putStrLn (constructNaive (Just (rootVal tree)) tree)
+chat :: AATree (WordSet String) -> AATree (WordSet String) -> IO ()
+chat tree1 tree2 = do
+    putStrLn $show $size tree1
+    if tree1 /= emptyTree then putStrLn (constructNaive (Just (rootVal tree1)) tree1)
     else putStrLn "Created a file."
     putStr ":> "
     userInp <- getLine
-    if userInp == "quit" then quit tree
-    else chat (addSent userInp tree)
+    putStrLn $show $bestSentence userInp $map word $inorder tree2
+    if userInp == "quit" then quit tree1 tree2
+    else chat (addSent userInp tree1) tree2
     
-quit :: AATree (WordSet String) -> IO ()
-quit tree = do
+quit :: AATree (WordSet String) -> AATree (WordSet String) -> IO ()
+quit tree1 tree2 = do
     putStrLn "Saving..."
+    writeFile wordsets $show tree1
+    writeFile conversations $show tree2
     putStrLn "Done. Okay. Bye!"
-    writeFile memory $show tree
       
 userInput :: String -> String
 userInput str = "u:" ++ str ++ "\n"
@@ -39,8 +46,10 @@ createWords str = undefined
           
 printMemory :: IO() 
 printMemory = do
-    str <- readFile memory
-    putStrLn str
+    sets <- readFile wordsets
+    sents <- readFile conversations
+    putStrLn sets
+    putStrLn sents
     
 main = prog
   -- Compile this file using
